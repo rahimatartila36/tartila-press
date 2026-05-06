@@ -16,7 +16,7 @@ use Illuminate\View\View;
 class RegisteredUserController extends Controller
 {
     /**
-     * Display the registration view.
+     * Tampilkan halaman register
      */
     public function create(): View
     {
@@ -24,9 +24,7 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle an incoming registration request.
-     *
-     * @throws ValidationException
+     * Proses register user
      */
     public function store(Request $request): RedirectResponse
     {
@@ -36,16 +34,21 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // 🔥 WAJIB: simpan ke variabel $user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'user', // default role
         ]);
 
+        // 🔥 event register (Laravel default)
         event(new Registered($user));
 
+        // 🔥 auto login setelah register
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        // 🔥 redirect ke dashboard
+       return redirect('/profile');
     }
 }

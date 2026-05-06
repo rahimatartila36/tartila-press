@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Cart;
+use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,17 +14,28 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Tampilkan halaman profil user.
      */
     public function edit(Request $request): View
     {
+        $carts = Cart::where('user_id', auth()->id())
+            ->with('book')
+            ->get();
+
+        $orders = Order::where('user_id', auth()->id())
+            ->with('items')
+            ->latest()
+            ->get();
+
         return view('profile.edit', [
             'user' => $request->user(),
+            'carts' => $carts,
+            'orders' => $orders,
         ]);
     }
 
     /**
-     * Update the user's profile information.
+     * Update data profil user.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
@@ -38,7 +51,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Delete the user's account.
+     * Hapus akun user.
      */
     public function destroy(Request $request): RedirectResponse
     {

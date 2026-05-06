@@ -19,9 +19,10 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+    'name',
+    'email',
+    'password',
+    'role', // 🔥 penting
     ];
 
     /**
@@ -46,4 +47,30 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+// ROLE CHECK
+public function isAdmin()
+{
+    return $this->role === 'admin';
 }
+
+public function isOwner()
+{
+    return $this->role === 'owner';
+}
+
+public function isPenulis()
+{
+    return $this->role === 'penulis';
+}
+
+public function isEditor()
+{
+    return $this->role === 'editor';
+}
+
+public function isUser()
+{
+    return $this->role === 'user';
+}
+    }
+

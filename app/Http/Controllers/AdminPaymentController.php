@@ -9,9 +9,13 @@ class AdminPaymentController extends Controller
 {
     public function index()
     {
-        $payments = Payment::latest()->get();
-        return view('admin.payments.index', compact('payments'));
+        $payments = Payment::with(['package', 'book'])
+        ->latest()
+        ->get();
+
+         return view('admin.payments.index', compact('payments'));
     }
+    
 
     public function approve($id)
     {

@@ -8,157 +8,157 @@ use App\Models\Package;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ProfileController;
-
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AdminPaymentController;
 
 /* =========================
    LANDING PAGE
 ========================= */
 
 Route::get('/', function () {
-
-    $books = Book::latest()
-                ->take(8)
-                ->get();
+    $books = Book::latest()->take(8)->get();
 
     $packages = Package::where('is_active', true)
-                ->latest()
-                ->get();
+        ->latest()
+        ->get();
 
-    return view(
-        'landing.home',
-        compact('books','packages')
-    );
-
+    return view('landing.home', compact('books', 'packages'));
 });
-
 
 /* =========================
-   HALAMAN PEMBAYARAN
+   DETAIL BUKU
 ========================= */
 
-Route::get('/payment/{id}', function ($id) {
+Route::get('/books/{id}', function ($id) {
+    $book = Book::findOrFail($id);
 
-    $package = Package::findOrFail($id);
-
-    return view(
-        'landing.payment',
-        compact('package')
-    );
-
+    return view('landing.book-detail', compact('book'));
 });
 
+/* =========================
+   PEMBAYARAN USER
+========================= */
 
+Route::middleware(['auth'])->group(function () {
+
+    // Pembayaran paket
+    Route::get('/payment/package/{id}', [PaymentController::class, 'createPackage']);
+
+    // Pembayaran buku
+    Route::get('/payment/book/{id}', [PaymentController::class, 'createBook']);
+
+    // Pembayaran order dari cart
+    Route::get('/payment/order/{order}', [PaymentController::class, 'createOrder'])
+        ->name('payment.order');
+
+    // Simpan pembayaran biasa
+    Route::post('/payment', [PaymentController::class, 'store'])
+        ->name('payment.store');
+
+    // Simpan pembayaran dari order/cart
+    Route::post('/payment/order/{order}', [PaymentController::class, 'storeOrder'])
+        ->name('payment.store.order');
+
+    Route::get('/payment-success', function () {
+        return view('landing.payment-success');
+    })->name('payment.success');
+
+});
 /* =========================
    DASHBOARD
 ========================= */
 
 Route::get('/dashboard', function () {
-
     return view('dashboard');
-
 })
 ->middleware(['auth'])
 ->name('dashboard');
 
-
 /* =========================
-   ADMIN (LOGIN WAJIB)
+   ADMIN LOGIN WAJIB
 ========================= */
 
 Route::middleware(['auth'])->group(function () {
 
-    /* =====================
-       BOOKS
-    ===================== */
+    /* BOOKS */
+    Route::get('/admin/books', [BookController::class, 'index']);
+    Route::get('/admin/books/create', [BookController::class, 'create']);
+    Route::post('/admin/books', [BookController::class, 'store']);
+    Route::get('/admin/books/{id}/edit', [BookController::class, 'edit']);
+    Route::put('/admin/books/{id}', [BookController::class, 'update']);
+    Route::delete('/admin/books/{id}', [BookController::class, 'destroy']);
 
-    Route::get('/admin/books',
-    [BookController::class,'index']);
+    /* PACKAGES */
+    Route::get('/admin/packages', [PackageController::class, 'index']);
+    Route::get('/admin/packages/create', [PackageController::class, 'create']);
+    Route::post('/admin/packages', [PackageController::class, 'store']);
+    Route::get('/admin/packages/{id}/edit', [PackageController::class, 'edit']);
+    Route::put('/admin/packages/{id}', [PackageController::class, 'update']);
+    Route::delete('/admin/packages/{id}', [PackageController::class, 'destroy']);
 
-    Route::get('/admin/books/create',
-    [BookController::class,'create']);
+    /* PAYMENTS */
+    Route::get('/admin/payments', [AdminPaymentController::class, 'index'])
+        ->name('admin.payments');
 
-    Route::post('/admin/books',
-    [BookController::class,'store']);
+    Route::post('/admin/payments/{id}/approve', [AdminPaymentController::class, 'approve'])
+        ->name('admin.payments.approve');
 
-    Route::get('/admin/books/{id}/edit',
-    [BookController::class,'edit']);
+    Route::post('/admin/payments/{id}/reject', [AdminPaymentController::class, 'reject'])
+        ->name('admin.payments.reject');
 
-    Route::put('/admin/books/{id}',
-    [BookController::class,'update']);
+    Route::put('/admin/payments/{id}/status', [AdminPaymentController::class, 'updateStatus']);
 
-    Route::delete('/admin/books/{id}',
-    [BookController::class,'destroy']);
+    Route::delete('/admin/payments/{id}', [AdminPaymentController::class, 'destroy']);
 
+    Route::get('/payment/order/{id}', [PaymentController::class, 'createOrder'])
+    ->middleware('auth');
 
-    /* =====================
-       PACKAGES
-    ===================== */
-
-    Route::get('/admin/packages',
-    [PackageController::class,'index']);
-
-    Route::get('/admin/packages/create',
-    [PackageController::class,'create']);
-
-    Route::post('/admin/packages',
-    [PackageController::class,'store']);
-
-    Route::get('/admin/packages/{id}/edit',
-    [PackageController::class,'edit']);
-
-    Route::put('/admin/packages/{id}',
-    [PackageController::class,'update']);
-
-    Route::delete('/admin/packages/{id}',
-    [PackageController::class,'destroy']);
-
-});
-
+    });
 
 /* =========================
-   PROFILE (BREEZE)
+   PROFILE BREEZE
 ========================= */
 
 Route::middleware('auth')->group(function () {
 
-    Route::get('/profile',
-    [ProfileController::class, 'edit'])
-    ->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
 
-    Route::patch('/profile',
-    [ProfileController::class, 'update'])
-    ->name('profile.update');
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
 
-    Route::delete('/profile',
-    [ProfileController::class, 'destroy'])
-    ->name('profile.destroy');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+});
+
+use App\Http\Controllers\CheckoutController;
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/checkout', [CheckoutController::class, 'index']);
+    Route::post('/checkout', [CheckoutController::class, 'store']);
 
 });
 
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\CartController;
 
-Route::get('/payment/{id}',
-[PaymentController::class,'create']);
+Route::middleware(['auth'])->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])
+        ->name('cart.index');
 
-Route::post('/payment',
-[PaymentController::class,'store']);
+    Route::post('/cart/add', [CartController::class, 'add'])
+        ->name('cart.add');
 
-Route::get('/payment-success', function () {
+    Route::put('/cart/{cart}/qty', [CartController::class, 'updateQty'])
+        ->name('cart.qty');
 
-    return view('landing.payment-success');
+    Route::delete('/cart/{cart}', [CartController::class, 'destroy'])
+        ->name('cart.destroy');
 
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])
+        ->name('cart.checkout');
 });
 
-Route::prefix('admin')->middleware(['auth'])->group(function () {
-    Route::get('/payments', [AdminPaymentController::class, 'index'])->name('admin.payments');
-    Route::post('/payments/{id}/approve', [AdminPaymentController::class, 'approve'])->name('admin.payments.approve');
-    Route::post('/payments/{id}/reject', [AdminPaymentController::class, 'reject'])->name('admin.payments.reject');
-});
 
-Route::put('/admin/payments/{id}/status', [App\Http\Controllers\AdminPaymentController::class, 'updateStatus']);
-
-use App\Http\Controllers\AdminPaymentController;
-
-Route::delete('/admin/payments/{id}', [AdminPaymentController::class, 'destroy']);
 
 require __DIR__.'/auth.php';

@@ -35,14 +35,17 @@
     </div>
 
     <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5>Leads Kontak</h5>
-                <h3>0</h3>
-            </div>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5>Pembayaran</h5>
+            <h3>{{ \App\Models\Payment::count() }}</h3>
+
+            <a href="/admin/payments" class="btn btn-primary btn-sm mt-2">
+                Cek Pembayaran
+            </a>
         </div>
     </div>
-
+</div>
 </div>
 
 
@@ -66,15 +69,15 @@
             </thead>
 
             <tbody>
-    @forelse(\App\Models\Payment::latest()->get() as $payment)
+    @forelse(\App\Models\Payment::with(['package', 'book'])->latest()->take(5)->get() as $payment)
         <tr>
             <td>{{ $payment->name }}</td>
 
             <td>
-                @if($payment->package)
-                    {{ $payment->package->title }}
+                @if($payment->type == 'book' || $payment->type == 'buku')
+                    {{ $payment->book->title ?? 'Buku Fisik / Ebook' }}
                 @else
-                    Buku Fisik / Ebook
+                    {{ $payment->package->name ?? 'Paket Penerbitan' }}
                 @endif
             </td>
 

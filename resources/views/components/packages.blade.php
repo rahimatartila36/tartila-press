@@ -86,7 +86,7 @@ Tanya via WhatsApp
 </a>
 
 <a
-href="/payment/{{ $package->id }}"
+href="/payment/package/{{ $package->id }}"
 class="btn btn-primary w-100">
 
 Bayar Sekarang

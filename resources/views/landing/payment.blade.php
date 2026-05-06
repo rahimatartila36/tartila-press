@@ -2,167 +2,240 @@
 <html lang="id">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1">
+    <title>Pembayaran</title>
 
-<title>Pembayaran</title>
-
-<link
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body>
+<body style="background:#f8f9fa;">
+
+@include('components.navbar')
 
 <div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
 
-<div class="row justify-content-center">
+            <div class="card shadow border-0">
+                <div class="card-header text-center bg-white">
+                    <h4 class="mb-0">
+                        @if($type == 'package')
+                            Pembayaran Paket
+                        @elseif($type == 'book')
+                            Pembayaran Buku
+                        @else
+                            Pembayaran Pesanan
+                        @endif
+                    </h4>
+                </div>
 
-<div class="col-md-6">
+                <div class="card-body text-center">
 
-<div class="card shadow">
+                    {{-- ERROR VALIDASI --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger text-start">
+                            <strong>Data belum berhasil dikirim:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-<div class="card-header text-center">
+                    @if(session('success'))
+                        <div class="alert alert-success text-start">
+                            {{ session('success') }}
+                        </div>
+                    @endif
 
-<h4>Pembayaran Paket</h4>
+                    @if($type == 'package')
 
-</div>
+                        @if($package && $package->image)
+                            <img src="/packages/{{ $package->image }}"
+                                 width="150"
+                                 class="mb-3 rounded shadow-sm">
+                        @endif
 
-<div class="card-body text-center">
+                        <h5 class="fw-bold">{{ $package->name }}</h5>
 
-@if($package->image)
+                        <p class="text-muted">
+                            Kategori: {{ $package->category }}
+                        </p>
 
-<img
-src="/packages/{{ $package->image }}"
-width="150"
-class="mb-3">
+                        @php
+                            $discount = $package->discount ?? 0;
+                            $finalPrice = $package->price - ($package->price * $discount / 100);
+                        @endphp
 
-@endif
+                    @elseif($type == 'book')
 
-<h5>
+                        @if($book && $book->cover)
+                            <img src="{{ asset('storage/'.$book->cover) }}"
+                                 width="150"
+                                 class="mb-3 rounded shadow-sm">
+                        @endif
 
-{{ $package->name }}
+                        <h5 class="fw-bold">{{ $book->title }}</h5>
 
-</h5>
+                        <p class="text-muted">
+                            Penulis: {{ $book->author }}
+                        </p>
 
-<p>
+                        @php
+                            $discount = $book->diskon ?? 0;
+                            $finalPrice = $discount > 0
+                                ? $book->harga - ($book->harga * $discount / 100)
+                                : $book->harga;
+                        @endphp
 
-Kategori: {{ $package->category }}
+                    @else
 
-</p>
+                        <h5 class="fw-bold">Pesanan Buku</h5>
 
-@php
+                        <p class="text-muted">
+                            Order #{{ $order->id }}
+                        </p>
 
-$finalPrice =
-$package->price -
-($package->price *
-$package->discount / 100);
+                        <div class="text-start mb-3">
+                            @foreach($order->items as $item)
+                                <div class="d-flex justify-content-between align-items-center border-bottom py-3">
 
-@endphp
+                                    <div class="d-flex align-items-center gap-3">
+                                        @if($item->book && $item->book->cover)
+                                            <img src="{{ asset('storage/'.$item->book->cover) }}"
+                                                 style="width:60px; height:80px; object-fit:cover; border-radius:8px;">
+                                        @else
+                                            <div class="bg-light d-flex align-items-center justify-content-center"
+                                                 style="width:60px; height:80px; border-radius:8px;">
+                                                <small class="text-muted">No Cover</small>
+                                            </div>
+                                        @endif
 
-<h3 class="text-success">
+                                        <div>
+                                            <strong>{{ $item->book->title ?? '-' }}</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                {{ $item->qty }} x Rp {{ number_format($item->price, 0, ',', '.') }}
+                                            </small>
+                                        </div>
+                                    </div>
 
-Rp {{ number_format($finalPrice) }}
+                                    <div class="fw-semibold">
+                                        Rp {{ number_format($item->price * $item->qty, 0, ',', '.') }}
+                                    </div>
 
-</h3>
+                                </div>
+                            @endforeach
+                        </div>
 
-<hr>
+                        @php
+                            $finalPrice = $order->total_price;
+                        @endphp
 
-<h5>Transfer ke Rekening:</h5>
+                    @endif
 
-<div class="alert alert-info">
+                    <h3 class="text-success fw-bold mt-3">
+                        Rp {{ number_format($finalPrice, 0, ',', '.') }}
+                    </h3>
 
-<strong>
-Bank BCA
-</strong>
+                    <hr>
 
-<br>
+                    <h5 class="fw-bold">Transfer ke Rekening:</h5>
 
-1234567890
+                    <div class="alert alert-info">
+                        <strong>Bank Mandiri</strong>
+                        <br>
+                        1090023952914
+                        <br>
+                        a.n. Rahima Tartila
+                    </div>
 
-<br>
+                    <form method="POST"
+                          action="{{ route('payment.store') }}"
+                          enctype="multipart/form-data">
 
-a.n. PT Tartila Press
+                        @csrf
 
-</div>
+                        <input type="hidden" name="type" value="{{ $type }}">
 
-<form method="POST"
-action="/payment"
-enctype="multipart/form-data">
+                        @if($package)
+                            <input type="hidden" name="package_id" value="{{ $package->id }}">
+                        @endif
 
-@csrf
+                        @if($book)
+                            <input type="hidden" name="book_id" value="{{ $book->id }}">
+                        @endif
 
-<input type="hidden"
-name="package_id"
-value="{{ $package->id }}">
+                        @if($order)
+                            <input type="hidden" name="order_id" value="{{ $order->id }}">
+                        @endif
 
-<div class="mb-3">
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Nama Anda</label>
+                            <input type="text"
+                                   name="name"
+                                   class="form-control"
+                                   value="{{ old('name', auth()->user()->name ?? '') }}"
+                                   required>
+                        </div>
 
-<label>Nama Anda</label>
+                        <div class="mb-3 text-start">
+                            <label class="form-label">No WhatsApp</label>
+                            <input type="text"
+                                   name="phone"
+                                   class="form-control"
+                                   value="{{ old('phone') }}"
+                                   placeholder="Contoh: 081234567890"
+                                   required>
+                        </div>
 
-<input
-type="text"
-name="name"
-class="form-control"
-required>
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Upload Bukti Transfer</label>
+                            <input type="file"
+                                   name="proof"
+                                   class="form-control"
+                                   accept="image/*"
+                                   required>
+                            <small class="text-muted">
+                                Format: JPG, JPEG, PNG, atau WEBP. Maksimal 2MB.
+                            </small>
+                        </div>
 
-</div>
+                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                            Kirim Bukti Pembayaran
+                        </button>
 
-<div class="mb-3">
+                    </form>
 
-<label>No WhatsApp</label>
+                    @if($type == 'package')
+                        <a href="https://wa.me/6281270348598?text=Saya sudah transfer paket {{ $package->name }}"
+                           target="_blank"
+                           class="btn btn-success w-100">
+                            Konfirmasi Pembayaran via WhatsApp
+                        </a>
+                    @elseif($type == 'book')
+                        <a href="https://wa.me/6281270348598?text=Saya sudah transfer pembelian buku {{ $book->title }}"
+                           target="_blank"
+                           class="btn btn-success w-100">
+                            Konfirmasi Pembayaran via WhatsApp
+                        </a>
+                    @else
+                        <a href="https://wa.me/6281270348598?text=Saya sudah transfer pesanan buku Order #{{ $order->id }}"
+                           target="_blank"
+                           class="btn btn-success w-100">
+                            Konfirmasi Pembayaran via WhatsApp
+                        </a>
+                    @endif
 
-<input
-type="text"
-name="phone"
-class="form-control"
-required>
+                </div>
+            </div>
 
-</div>
-
-<div class="mb-3">
-
-<label>Upload Bukti Transfer</label>
-
-<input
-type="file"
-name="proof"
-class="form-control"
-required>
-
-</div>
-
-<button
-class="btn btn-primary w-100">
-
-Kirim Bukti Pembayaran
-
-</button>
-
-</form>
-
-<a
-href="https://wa.me/6281270348598?text=Saya sudah transfer paket {{ $package->name }}"
-target="_blank"
-class="btn btn-success w-100">
-
-Konfirmasi Pembayaran via WhatsApp
-
-</a>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
+        </div>
+    </div>
 </div>
 
 </body>
-
 </html>
