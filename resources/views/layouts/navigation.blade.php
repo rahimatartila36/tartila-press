@@ -10,7 +10,7 @@
             {{-- Logo + Brand --}}
             <a href="/" class="d-flex align-items-center text-decoration-none">
 
-                <img src="{{ asset('images/logo.PNG') }}"
+                <img src="{{ asset('images/logo.png') }}"
                      alt="Tartila Press"
                      style="
                         height:50px;

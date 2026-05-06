@@ -6,7 +6,7 @@
         {{-- Logo & Brand --}}
         <a href="/" class="navbar-brand d-flex align-items-center text-decoration-none">
 
-            <img src="{{ asset('images/logo.PNG') }}"
+            <img src="{{ asset('images/logo.png') }}"
                  alt="Tartila Press"
                  class="navbar-logo">
 
