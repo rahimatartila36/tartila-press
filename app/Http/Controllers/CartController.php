@@ -103,7 +103,7 @@ class CartController extends Controller
         'book_id' => $cart->book_id,
         'book_title' => $cart->book->title ?? '-',
         'qty' => $cart->qty,
-        'harga' => $price,
+        'price' => $price,
         'subtotal' => $subtotal,
     ]);
 }
