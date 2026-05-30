@@ -41,23 +41,31 @@
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#about">Tentang</a>
+                    <a class="nav-link" href="/#about">Tentang</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#services">Layanan</a>
+                    <a class="nav-link" href="/#services">Layanan</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#paket">Paket</a>
+                    <a class="nav-link" href="/#paket">Paket</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#books">Katalog</a>
+                    <a href="{{ route('books.catalog') }}" class="nav-link">
+                        Katalog
+                    </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#contact">Kontak</a>
+                    <a href="{{ route('book-chapters.index') }}" class="nav-link">
+                        Book Chapter
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/#contact">Kontak</a>
                 </li>
 
                 @guest

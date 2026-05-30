@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use Illuminate\Http\Request;
+use App\Models\BookChapterItem;
 
 class AdminPaymentController extends Controller
 {
@@ -36,13 +37,43 @@ class AdminPaymentController extends Controller
     }
 
     public function updateStatus(Request $request, $id)
-    {
-        $payment = Payment::findOrFail($id);
-        $payment->status = $request->status;
-        $payment->save();
+{
+    $request->validate([
+        'status' => 'required',
+    ]);
 
-        return back()->with('success', 'Status pembayaran berhasil diperbarui.');
+    $payment = Payment::findOrFail($id);
+
+    $payment->update([
+        'status' => $request->status,
+    ]);
+
+    if ($payment->type === 'book_chapter' && $payment->book_chapter_item_id) {
+        $chapterItem = \App\Models\BookChapterItem::find($payment->book_chapter_item_id);
+
+        if ($chapterItem) {
+            if ($request->status === 'sudah bayar') {
+                $chapterItem->update([
+                    'status' => 'sold',
+                ]);
+            }
+
+            if ($request->status === 'belum bayar' || $request->status === 'rejected') {
+                $chapterItem->update([
+                    'status' => 'available',
+                ]);
+            }
+
+            if ($request->status === 'pending') {
+                $chapterItem->update([
+                    'status' => 'pending',
+                ]);
+            }
+        }
     }
+
+    return back()->with('success', 'Status pembayaran berhasil diperbarui.');
+}
 
     public function destroy($id)
     {

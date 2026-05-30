@@ -86,10 +86,23 @@
                                 <input type="text" name="penerbit" class="form-control">
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Kategori</label>
-                                <input type="text" name="kategori" class="form-control">
+                            <div class="mb-3">
+                                <label>Kategori Buku</label>
+
+                                <input type="text"
+                                    name="kategori"
+                                    class="form-control"
+                                    placeholder="Contoh: Buku Ajar, Novel, Referensi">
                             </div>
+
+                            <div class="mb-3">
+                                <label>Kategori Keilmuan</label>
+
+                                <input type="text"
+                                    name="keilmuan"
+                                    class="form-control"
+                                    placeholder="Contoh: Pendidikan Matematika, PGSD">
+</div>
                         </div>
 
                     </div>

@@ -52,9 +52,22 @@
                             <input type="text" name="penerbit" class="form-control" value="{{ $book->penerbit }}">
                         </div>
 
+                        <<div class="mb-3">
+                            <label>Kategori Buku</label>
+
+                            <input type="text"
+                                name="kategori"
+                                class="form-control"
+                                value="{{ old('kategori', $book->kategori) }}">
+                        </div>
+
                         <div class="mb-3">
-                            <label>Kategori</label>
-                            <input type="text" name="kategori" class="form-control" value="{{ $book->kategori }}">
+                            <label>Kategori Keilmuan</label>
+
+                            <input type="text"
+                                name="keilmuan"
+                                class="form-control"
+                                value="{{ old('keilmuan', $book->keilmuan) }}">
                         </div>
 
                         <div class="mb-3">

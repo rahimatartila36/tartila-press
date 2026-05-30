@@ -40,6 +40,7 @@
 @include('components.packages', ['packages' => $packages])
 
 @include('components.books', ['books' => $books])
+@include('components.book-chapters')
 
 <footer style="background:#003153; color:white;">
 

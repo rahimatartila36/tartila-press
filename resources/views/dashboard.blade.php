@@ -46,6 +46,18 @@
         </div>
     </div>
 </div>
+<div class="col-md-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5>Book Chapter</h5>
+            <h3>{{ \App\Models\BookChapter::count() }}</h3>
+
+            <a href="/admin/book-chapters" class="btn btn-primary btn-sm mt-2">
+                Kelola Book Chapter
+            </a>
+        </div>
+    </div>
+</div>
 </div>
 
 

@@ -18,6 +18,7 @@ class Book extends Model
         'desain',
         'penerbit',
         'kategori',
+        'keilmuan',
         'tahun_terbit',
         'harga',
         'diskon',

@@ -25,8 +25,10 @@
                             Pembayaran Paket
                         @elseif($type == 'book')
                             Pembayaran Buku
-                        @else
+                        @elseif($type == 'order')
                             Pembayaran Pesanan
+                        @elseif($type == 'book_chapter')
+                            Pembayaran Bab Buku
                         @endif
                     </h4>
                 </div>
@@ -91,7 +93,43 @@
                                 : $book->harga;
                         @endphp
 
-                    @else
+                    @elseif($type == 'book_chapter')
+
+                        <h5 class="fw-bold">
+                            {{ $chapterItem->chapter_title }}
+                        </h5>
+
+                        <p class="text-muted mb-1">
+                            Buku: {{ $chapterItem->bookChapter->title ?? '-' }}
+                        </p>
+
+                        <p class="text-muted mb-1">
+                            Bidang: {{ $chapterItem->bookChapter->field ?? '-' }}
+                        </p>
+
+                       @php
+                            $hargaDasar = $chapterItem->price ?: optional($chapterItem->bookChapter->package)->price ?: 0;
+
+                            $discount = $chapterItem->discount > 0
+                                ? $chapterItem->discount
+                                : (optional($chapterItem->bookChapter->package)->discount ?: 0);
+
+                            $finalPrice = $hargaDasar - ($hargaDasar * $discount / 100);
+                        @endphp
+
+                        <div class="alert alert-light border text-start mt-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Harga Bab</span>
+                                <strong>Rp {{ number_format($hargaDasar, 0, ',', '.') }}</strong>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <span>Diskon</span>
+                                <strong>{{ $discount }}%</strong>
+                            </div>
+                        </div>
+
+                    @elseif($type == 'order')
 
                         <h5 class="fw-bold">Pesanan Buku</h5>
 
@@ -161,16 +199,20 @@
 
                         <input type="hidden" name="type" value="{{ $type }}">
 
-                        @if($package)
+                        @if($type == 'package' && $package)
                             <input type="hidden" name="package_id" value="{{ $package->id }}">
                         @endif
 
-                        @if($book)
+                        @if($type == 'book' && $book)
                             <input type="hidden" name="book_id" value="{{ $book->id }}">
                         @endif
 
-                        @if($order)
+                        @if($type == 'order' && $order)
                             <input type="hidden" name="order_id" value="{{ $order->id }}">
+                        @endif
+
+                        @if($type == 'book_chapter' && $chapterItem)
+                            <input type="hidden" name="book_chapter_item_id" value="{{ $chapterItem->id }}">
                         @endif
 
                         <div class="mb-3 text-start">
@@ -216,13 +258,22 @@
                            class="btn btn-success w-100">
                             Konfirmasi Pembayaran via WhatsApp
                         </a>
+
                     @elseif($type == 'book')
                         <a href="https://wa.me/6281270348598?text=Saya sudah transfer pembelian buku {{ $book->title }}"
                            target="_blank"
                            class="btn btn-success w-100">
                             Konfirmasi Pembayaran via WhatsApp
                         </a>
-                    @else
+
+                    @elseif($type == 'book_chapter')
+                        <a href="https://wa.me/6281270348598?text=Saya sudah transfer pembelian bab {{ $chapterItem->chapter_title }} dari buku {{ $chapterItem->bookChapter->title ?? '-' }}"
+                           target="_blank"
+                           class="btn btn-success w-100">
+                            Konfirmasi Pembayaran via WhatsApp
+                        </a>
+
+                    @elseif($type == 'order')
                         <a href="https://wa.me/6281270348598?text=Saya sudah transfer pesanan buku Order #{{ $order->id }}"
                            target="_blank"
                            class="btn btn-success w-100">

@@ -41,13 +41,16 @@
                 <a href="/#paket" class="btn btn-sm" style="border:1px solid #D8E2DC; color:#D8E2DC;">Paket</a>
                 <a href="/cart" class="btn btn-sm" style="background:#D8E2DC; color:#1D3557;">Keranjang</a>
 
-                <div class="dropdown">
-                    <button class="btn btn-sm dropdown-toggle fw-semibold"
-                            style="background:#D8E2DC; color:#1D3557;"
-                            type="button"
-                            data-bs-toggle="dropdown">
-                        {{ Auth::user()->name }}
-                    </button>
+                <@auth
+                    <div class="dropdown">
+                        <button class="btn btn-sm dropdown-toggle fw-semibold"
+                                style="background:#D8E2DC; color:#1D3557;"
+                                type="button"
+                                data-bs-toggle="dropdown">
+                            {{ Auth::user()->name }}
+                        </button>
+                    </div>
+                    @endauth
 
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>

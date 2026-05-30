@@ -15,6 +15,7 @@ class Payment extends Model
     'phone',
     'proof',
     'status',
+    'book_chapter_item_id'
 ];
 
     public function package()
@@ -26,4 +27,8 @@ class Payment extends Model
     {
         return $this->belongsTo(Book::class);
     }
+   public function bookChapterItem()
+{
+    return $this->belongsTo(BookChapterItem::class);
+}
 }
