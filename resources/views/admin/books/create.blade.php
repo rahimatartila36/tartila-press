@@ -34,6 +34,21 @@
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label">Akun Penulis untuk Royalti</label>
+                            <select name="user_id" class="form-select">
+                                <option value="">-- Pilih Penulis --</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}">
+                                        {{ $user->name }} - {{ $user->email }} - {{ $user->role }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <small class="text-muted">
+                                Akun ini akan dipakai untuk menghitung royalti dan profil publik penulis.
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label">Penulis</label>
                             <textarea name="author" class="form-control" rows="2" required></textarea>
                         </div>

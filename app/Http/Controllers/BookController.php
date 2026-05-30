@@ -4,24 +4,33 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Book;
+use App\Models\User;
 
 class BookController extends Controller
 {
     public function index()
     {
-        $books = Book::latest()->get();
+        $books = Book::with('user')
+            ->latest()
+            ->get();
 
         return view('admin.books.index', compact('books'));
     }
 
     public function create()
     {
-        return view('admin.books.create');
+        $users = User::whereIn('role', ['penulis', 'user'])
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.books.create', compact('users'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
+            'user_id' => 'nullable|exists:users,id',
+
             'title' => 'required|string|max:255',
             'author' => 'required|string',
             'year' => 'nullable|string|max:255',
@@ -48,14 +57,19 @@ class BookController extends Controller
 
         Book::create($data);
 
-        return redirect('/admin/books')->with('success', 'Buku berhasil ditambahkan.');
+        return redirect('/admin/books')
+            ->with('success', 'Buku berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
         $book = Book::findOrFail($id);
 
-        return view('admin.books.edit', compact('book'));
+        $users = User::whereIn('role', ['penulis', 'user'])
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.books.edit', compact('book', 'users'));
     }
 
     public function update(Request $request, $id)
@@ -63,6 +77,8 @@ class BookController extends Controller
         $book = Book::findOrFail($id);
 
         $data = $request->validate([
+            'user_id' => 'nullable|exists:users,id',
+
             'title' => 'required|string|max:255',
             'author' => 'required|string',
             'year' => 'nullable|string|max:255',
@@ -89,7 +105,8 @@ class BookController extends Controller
 
         $book->update($data);
 
-        return redirect('/admin/books')->with('success', 'Buku berhasil diperbarui.');
+        return redirect('/admin/books')
+            ->with('success', 'Buku berhasil diperbarui.');
     }
 
     public function destroy($id)
@@ -98,6 +115,7 @@ class BookController extends Controller
 
         $book->delete();
 
-        return redirect('/admin/books')->with('success', 'Buku berhasil dihapus.');
+        return redirect('/admin/books')
+            ->with('success', 'Buku berhasil dihapus.');
     }
 }

@@ -215,23 +215,11 @@
                             <input type="hidden" name="book_chapter_item_id" value="{{ $chapterItem->id }}">
                         @endif
 
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Nama Anda</label>
-                            <input type="text"
-                                   name="name"
-                                   class="form-control"
-                                   value="{{ old('name', auth()->user()->name ?? '') }}"
-                                   required>
-                        </div>
-
-                        <div class="mb-3 text-start">
-                            <label class="form-label">No WhatsApp</label>
-                            <input type="text"
-                                   name="phone"
-                                   class="form-control"
-                                   value="{{ old('phone') }}"
-                                   placeholder="Contoh: 081234567890"
-                                   required>
+                        <div class="alert alert-light border text-start">
+                            <strong>Pembayar:</strong> {{ auth()->user()->name ?? '-' }} <br>
+                            <small class="text-muted">
+                                {{ auth()->user()->email ?? '-' }}
+                            </small>
                         </div>
 
                         <div class="mb-3 text-start">

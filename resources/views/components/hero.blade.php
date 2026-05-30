@@ -10,7 +10,7 @@
         </h1>
 
         <p class="hero-subtitle">
-            Membantu penulis menerbitkan karya ber-ISBN
+            Membantu penulis menerbitkan karya 
             secara profesional dengan sistem modern,
             transparan, dan terpercaya.
         </p>

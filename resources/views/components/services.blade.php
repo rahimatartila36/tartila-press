@@ -26,7 +26,7 @@ Penerbitan Buku
 
 Layanan penerbitan buku profesional
 mulai dari naskah hingga terbit
-dengan ISBN resmi.
+dengan resmi.
 
 </p>
 

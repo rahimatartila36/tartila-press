@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\PublishingTracking;
+use App\Models\Royalty;
+use App\Models\PublishingSubmission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,30 +16,50 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Tampilkan halaman profil user.
-     */
     public function edit(Request $request): View
     {
-        $carts = Cart::where('user_id', auth()->id())
+        $user = $request->user();
+
+        $carts = Cart::where('user_id', $user->id)
             ->with('book')
+            ->latest()
             ->get();
 
-        $orders = Order::where('user_id', auth()->id())
+        $orders = Order::where('user_id', $user->id)
             ->with('items')
             ->latest()
             ->get();
 
+        $trackings = collect();
+        $royalties = collect();
+
+        if ($user->role === 'penulis') {
+            $trackings = PublishingTracking::where('user_id', $user->id)
+                ->latest()
+                ->get();
+
+            $royalties = Royalty::where('user_id', $user->id)
+                ->latest()
+                ->get();
+        }
+
+        // Semua user yang sudah membeli paket dan di-approve admin
+        // tetap bisa melihat pengajuan penerbitannya di profil
+        $submissions = PublishingSubmission::with('authors')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
             'carts' => $carts,
             'orders' => $orders,
+            'trackings' => $trackings,
+            'royalties' => $royalties,
+            'submissions' => $submissions,
         ]);
     }
 
-    /**
-     * Update data profil user.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
@@ -50,9 +73,6 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
-    /**
-     * Hapus akun user.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [

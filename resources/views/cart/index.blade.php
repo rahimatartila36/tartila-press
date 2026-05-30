@@ -1,5 +1,6 @@
-<x-app-layout>
+@extends('layouts.app')
 
+@section('content')
 <div class="container py-5">
 
     <div class="mb-4">
@@ -204,5 +205,4 @@
     // jalan pertama kali
     updateTotal();
 </script>
-
-</x-app-layout>
+@endsection

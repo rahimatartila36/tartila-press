@@ -1,161 +1,341 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Profil Saya
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+@section('content')
 
-            {{-- PROFIL --}}
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
+<div class="container py-5">
+
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1" style="color:#1D3557;">Profil Saya</h3>
+        <p class="text-muted mb-0">Kelola akun, keranjang, pembelian, naskah, dan royalti Anda.</p>
+    </div>
+
+    <div class="row g-4">
+
+        {{-- MENU KIRI --}}
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3">
+
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                             style="width:65px;height:65px;background:#1D3557;color:white;font-size:26px;font-weight:bold;">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </div>
+
+                        <div class="fw-bold small">{{ auth()->user()->name }}</div>
+                        <div class="text-muted small">{{ auth()->user()->email }}</div>
+                    </div>
+
+                    <div class="nav flex-column nav-pills gap-2" id="profileMenu" role="tablist">
+
+                        <button class="nav-link active text-start"
+                                data-bs-toggle="pill"
+                                data-bs-target="#akun"
+                                type="button">
+                            Pengaturan Akun
+                        </button>
+
+                        <button class="nav-link text-start"
+                                data-bs-toggle="pill"
+                                data-bs-target="#keranjang"
+                                type="button">
+                            Keranjang
+                        </button>
+
+                        <button class="nav-link text-start"
+                                data-bs-toggle="pill"
+                                data-bs-target="#pembelian"
+                                type="button">
+                            Pembelian
+                        </button>
+
+                        @if(auth()->user()->role === 'penulis')
+                            <button class="nav-link text-start"
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#naskah"
+                                    type="button">
+                                Naskah Saya
+                            </button>
+
+                            <button class="nav-link text-start"
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#royalti"
+                                    type="button">
+                                Royalti
+                            </button>
+                        @endif
+
+                    </div>
+
                 </div>
             </div>
+        </div>
 
-            {{-- PASSWORD --}}
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
+        {{-- KONTEN KANAN --}}
+        <div class="col-lg-9">
+            <div class="tab-content">
+
+                {{-- AKUN --}}
+                <div class="tab-pane fade show active" id="akun">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3">Pengaturan Akun</h5>
+
+                            @include('profile.partials.update-profile-information-form')
+
+                            <hr class="my-4">
+
+                            @include('profile.partials.update-password-form')
+
+                            <hr class="my-4">
+
+                            <h5 class="fw-bold text-danger mb-3">Hapus Akun</h5>
+                            @include('profile.partials.delete-user-form')
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            {{-- KERANJANG --}}
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <h3 class="text-lg font-semibold mb-4">
-                    Keranjang Saya
-                </h3>
+                {{-- KERANJANG --}}
+                <div class="tab-pane fade" id="keranjang">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3">Keranjang Saya</h5>
 
-                @if(isset($carts) && $carts->count() > 0)
+                            @if(isset($carts) && $carts->count() > 0)
 
-                    <div class="space-y-4">
-                        @foreach($carts as $item)
-                            <div class="border rounded-lg p-4 flex justify-between items-center">
+                                @foreach($carts as $item)
+                                    <div class="border rounded-3 p-3 mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">
+                                                    {{ $item->book->title ?? '-' }}
+                                                </div>
 
-                                <div>
-                                    <h4 class="font-semibold">
-                                        {{ $item->book->title }}
-                                    </h4>
+                                                <div class="text-muted small">
+                                                    Qty: {{ $item->qty }}
+                                                </div>
+                                            </div>
 
-                                    <p class="text-sm text-gray-600">
-                                        Qty: {{ $item->qty }}
-                                    </p>
+                                            <div class="fw-bold text-danger">
+                                                Rp {{ number_format(($item->book->harga ?? 0) * $item->qty, 0, ',', '.') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
 
-                                    <p class="text-sm font-semibold text-green-700">
-                                        Rp {{ number_format($item->book->harga * $item->qty, 0, ',', '.') }}
-                                    </p>
-                                </div>
-
-                                <a href="/cart/delete/{{ $item->id }}"
-                                   class="bg-red-600 text-white px-3 py-2 rounded text-sm">
-                                    Hapus
+                                <a href="{{ route('cart.index') }}" class="btn btn-primary">
+                                    Lihat Keranjang Lengkap
                                 </a>
 
-                            </div>
-                        @endforeach
+                            @else
+
+                                <p class="text-muted">Keranjang masih kosong.</p>
+
+                                <a href="/#books" class="btn btn-primary">
+                                    Lihat Katalog Buku
+                                </a>
+
+                            @endif
+                        </div>
                     </div>
+                </div>
 
-                    <div class="mt-5 flex gap-3">
-                        <a href="/cart"
-                           class="bg-blue-600 text-white px-4 py-2 rounded">
-                            Lihat Keranjang
-                        </a>
+                {{-- PEMBELIAN --}}
+                <div class="tab-pane fade" id="pembelian">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3">Pembelian Saya</h5>
 
-                        <a href="/checkout"
-                           class="bg-green-600 text-white px-4 py-2 rounded">
-                            Checkout
-                        </a>
-                    </div>
+                            @if(isset($orders) && $orders->count() > 0)
 
-                @else
+                                @foreach($orders as $order)
+                                    <div class="border rounded-3 p-3 mb-3">
 
-                    <p class="text-gray-600">
-                        Keranjang masih kosong.
-                    </p>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <div>
+                                                <div class="fw-bold">
+                                                    Order #{{ $order->id }}
+                                                </div>
 
-                    <a href="/#books"
-                       class="inline-block mt-3 bg-blue-600 text-white px-4 py-2 rounded">
-                        Lihat Katalog Buku
-                    </a>
+                                                <div class="text-muted small">
+                                                    {{ $order->created_at->format('d M Y H:i') }}
+                                                </div>
+                                            </div>
 
-                @endif
-            </div>
-
-            {{-- PROGRES PEMBELIAN --}}
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <h3 class="text-lg font-semibold mb-4">
-                    Progres Pembelian Buku
-                </h3>
-
-                @if(isset($orders) && $orders->count() > 0)
-
-                    <div class="space-y-4">
-                        @foreach($orders as $order)
-                            <div class="border rounded-lg p-4">
-
-                                <div class="flex justify-between items-start mb-3">
-                                    <div>
-                                        <h4 class="font-semibold">
-                                            Order #{{ $order->id }}
-                                        </h4>
-
-                                        <p class="text-sm text-gray-600">
-                                            {{ $order->created_at->format('d M Y H:i') }}
-                                        </p>
-                                    </div>
-
-                                    <span class="bg-blue-900 text-white px-3 py-1 rounded text-sm">
-                                        {{ str_replace('_', ' ', $order->status) }}
-                                    </span>
-                                </div>
-
-                                <div class="border-t border-b py-3 my-3 space-y-2">
-                                    @foreach($order->items as $item)
-                                        <div class="flex justify-between text-sm">
-                                            <span>
-                                                {{ $item->book_title }} x {{ $item->qty }}
-                                            </span>
-
-                                            <span>
-                                                Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                                            <span class="badge bg-primary">
+                                                {{ ucfirst(str_replace('_', ' ', $order->status)) }}
                                             </span>
                                         </div>
-                                    @endforeach
-                                </div>
 
-                                <div class="flex justify-between items-center">
-                                    <strong>
-                                        Total: Rp {{ number_format($order->total_price, 0, ',', '.') }}
-                                    </strong>
+                                        @foreach($order->items as $item)
+                                            <div class="d-flex justify-content-between border-bottom py-2 small">
+                                                <span>{{ $item->book_title }} x {{ $item->qty }}</span>
+                                                <span>Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                                            </div>
+                                        @endforeach
 
-                                    <a href="/orders/{{ $order->id }}"
-                                       class="bg-gray-800 text-white px-3 py-2 rounded text-sm">
-                                        Detail Pesanan
+                                        <div class="d-flex justify-content-between mt-3">
+                                            <strong>Total</strong>
+                                            <strong class="text-danger">
+                                                Rp {{ number_format($order->total_price, 0, ',', '.') }}
+                                            </strong>
+                                        </div>
+
+                                    </div>
+                                @endforeach
+
+                            @else
+
+                                <p class="text-muted">Belum ada pembelian buku.</p>
+
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                {{-- NASKAH --}}
+                @if(auth()->user()->role === 'penulis')
+                    <div class="tab-pane fade" id="naskah">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+
+                                <h5 class="fw-bold mb-3">Naskah Saya</h5>
+
+                                @forelse($submissions as $submission)
+
+                                    <div class="border rounded-3 p-3 mb-3">
+
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <div class="fw-bold">
+                                                    {{ $submission->book_title ?? 'Belum mengisi judul buku' }}
+                                                </div>
+
+                                                <small class="text-muted">
+                                                    Diajukan: {{ $submission->created_at->format('d M Y') }}
+                                                </small>
+                                            </div>
+
+                                            <span class="badge bg-primary">
+                                                {{ ucwords(str_replace('_', ' ', $submission->status)) }}
+                                            </span>
+                                        </div>
+
+                                        @if($submission->admin_note)
+                                            <div class="alert alert-info py-2 small mb-2">
+                                                <strong>Catatan Admin:</strong>
+                                                {{ $submission->admin_note }}
+                                            </div>
+                                        @endif
+
+                                        @if($submission->editor_note)
+                                            <div class="alert alert-warning py-2 small mb-2">
+                                                <strong>Catatan Editor:</strong>
+                                                {{ $submission->editor_note }}
+                                            </div>
+                                        @endif
+
+                                        <div class="mt-3 d-flex gap-2">
+
+                                            @if($submission->status === 'menunggu_upload_naskah')
+                                                <a href="{{ route('publishing-submissions.edit', $submission->id) }}"
+                                                   class="btn btn-sm btn-primary">
+                                                    Upload Naskah
+                                                </a>
+                                            @else
+                                                <a href="{{ route('publishing-submissions.edit', $submission->id) }}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    Lihat / Edit Data
+                                                </a>
+                                            @endif
+
+                                        </div>
+
+                                    </div>
+
+                                @empty
+
+                                    <p class="text-muted">
+                                        Belum ada pengajuan penerbitan.
+                                    </p>
+
+                                    <a href="/#packages" class="btn btn-primary">
+                                        Lihat Paket Penerbitan
                                     </a>
-                                </div>
+
+                                @endforelse
 
                             </div>
-                        @endforeach
+                        </div>
                     </div>
-
-                @else
-
-                    <p class="text-gray-600">
-                        Belum ada pembelian buku.
-                    </p>
-
                 @endif
-            </div>
 
-            {{-- HAPUS AKUN --}}
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
+                {{-- ROYALTI --}}
+                @if(auth()->user()->role === 'penulis')
+                    <div class="tab-pane fade" id="royalti">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
 
+                                <h5 class="fw-bold mb-3">Royalti Saya</h5>
+
+                                @forelse($royalties as $royalty)
+
+                                    <div class="border rounded-3 p-3 mb-3">
+
+                                        <div class="fw-bold mb-2">
+                                            {{ $royalty->book_title }}
+                                        </div>
+
+                                        <div class="row small">
+                                            <div class="col-md-6 mb-2">
+                                                Buku Terjual:
+                                                <strong>{{ $royalty->sold_qty }}</strong>
+                                            </div>
+
+                                            <div class="col-md-6 mb-2">
+                                                Royalti:
+                                                <strong>{{ $royalty->royalty_percent }}%</strong>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                Total Penjualan:
+                                                <strong>
+                                                    Rp {{ number_format($royalty->total_sales, 0, ',', '.') }}
+                                                </strong>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                Total Royalti:
+                                                <strong class="text-success">
+                                                    Rp {{ number_format($royalty->royalty_amount, 0, ',', '.') }}
+                                                </strong>
+                                            </div>
+                                        </div>
+
+                                        <span class="badge bg-secondary mt-3">
+                                            {{ ucwords(str_replace('_', ' ', $royalty->status)) }}
+                                        </span>
+
+                                    </div>
+
+                                @empty
+
+                                    <p class="text-muted">
+                                        Belum ada data royalti.
+                                    </p>
+
+                                @endforelse
+
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+            </div>
         </div>
+
     </div>
-</x-app-layout>
+
+</div>
+
+@endsection

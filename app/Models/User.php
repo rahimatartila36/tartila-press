@@ -23,6 +23,9 @@ class User extends Authenticatable
     'email',
     'password',
     'role', // 🔥 penting
+    'photo',
+    'bio',
+    'slug',
     ];
 
     /**
@@ -72,5 +75,11 @@ public function isUser()
 {
     return $this->role === 'user';
 }
-    }
+    
 
+public function books()
+{
+    return $this->hasMany(Book::class);
+}
+
+}

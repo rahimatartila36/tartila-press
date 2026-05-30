@@ -82,8 +82,6 @@ class PaymentController extends Controller
     {
         $request->validate([
             'type' => 'required|in:package,book,order,book_chapter',
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:30',
             'proof' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             'package_id' => 'nullable|exists:packages,id',
@@ -146,13 +144,17 @@ class PaymentController extends Controller
         );
 
         Payment::create([
+            'user_id' => auth()->id(),
             'package_id' => $request->type === 'package' ? $request->package_id : null,
             'book_id' => $request->type === 'book' ? $request->book_id : null,
             'order_id' => $request->type === 'order' ? $request->order_id : null,
             'book_chapter_item_id' => $request->type === 'book_chapter' ? $request->book_chapter_item_id : null,
             'type' => $request->type,
-            'name' => $request->name,
-            'phone' => $request->phone,
+
+            // otomatis dari akun login
+            'name' => auth()->user()->name,
+            'phone' => auth()->user()->phone ?? '-',
+
             'proof' => $proofName,
             'status' => 'pending',
         ]);

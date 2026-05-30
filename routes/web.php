@@ -17,6 +17,11 @@ use App\Http\Controllers\BookChapterController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\BookCatalogController;
+use App\Http\Controllers\AdminSubmissionController;
+use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AdminRoyaltyController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -275,6 +280,32 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/admin/payments/{id}', [AdminPaymentController::class, 'destroy'])
         ->name('admin.payments.destroy');
+
+
+  
+
+
+    Route::get('/admin/submissions', [AdminSubmissionController::class, 'index'])
+        ->name('admin.submissions.index');
+
+    Route::get('/admin/submissions/{submission}', [AdminSubmissionController::class, 'show'])
+        ->name('admin.submissions.show');
+
+    Route::put('/admin/submissions/{submission}/status', [AdminSubmissionController::class, 'updateStatus'])
+        ->name('admin.submissions.update-status');
+
+    Route::get('/admin/users', [AdminUserController::class, 'index'])
+        ->name('admin.users.index');
+
+    Route::put('/admin/users/{user}/role', [AdminUserController::class, 'updateRole'])
+        ->name('admin.users.update-role');
+
+    
+
+Route::resource('/admin/royalties', AdminRoyaltyController::class)
+    ->names('admin.royalties');
+
+
    
 });
 
@@ -295,5 +326,17 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
 });
+
+use App\Http\Controllers\PublishingSubmissionController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/publishing-submissions/{submission}/edit', [PublishingSubmissionController::class, 'edit'])
+        ->name('publishing-submissions.edit');
+
+    Route::put('/publishing-submissions/{submission}', [PublishingSubmissionController::class, 'update'])
+        ->name('publishing-submissions.update');
+});
+
+
 
 require __DIR__ . '/auth.php';

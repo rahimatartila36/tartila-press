@@ -58,7 +58,42 @@
         </div>
     </div>
 </div>
+
+<div class="col-md-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5>Naskah</h5>
+
+            <a href="{{ route('admin.submissions.index') }}" class="btn btn-primary">
+                Cek Naskah
+            </a>
+        </div>
+    </div>
 </div>
+
+<div class="col-md-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+         
+            <a href="{{ route('admin.users.index') }}" class="btn btn-success">
+                List User
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+         
+            <a href="{{ route('admin.royalties.index') }}" class="btn btn-warning">
+                Royalti Penulis
+            </a>
+        </div>
+    </div>
+</div>
+</div>
+
 
 
 <h4 class="mb-3">
